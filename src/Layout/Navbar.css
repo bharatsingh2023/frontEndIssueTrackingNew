@@ -1,0 +1,82 @@
+/* src/components/Navbar.css */
+
+.navbar {
+    background: linear-gradient(195.8deg, #0b74b0ff 0%, #75479cff 51%, #bd3861ff 81%);
+}
+
+.navbar .navbar-brand {
+    color: #fff;
+    font-size: 1.5rem;
+    margin-right: 2rem;
+}
+
+.navbar .nav-link {
+    color: #fff;
+    margin-right: 1rem;
+}
+
+.navbar .nav-link:hover {
+    color: #ddd;
+}
+
+.navbar .nav-dropdown .dropdown-item {
+    color: #000;
+}
+
+.navbar .nav-dropdown .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.selected-project {
+    color: #fff;
+    font-size: 1rem;
+    margin-left: 4rem;
+    padding-left: 2px;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    max-height: 3rem;
+    overflow-x: auto;
+
+}
+
+
+
+@media (max-width: 992px) {
+    .selected-project {
+        display: none;
+    }
+}
+
+
+/* Navbar.css */
+.custom-dropdown .dropdown-menu {
+    padding-left: 10px;
+    /* Add padding from the left */
+}
+
+.custom-dropdown .dropdown-item {
+    cursor: pointer;
+    /* Change cursor on hover */
+}
+
+.custom-dropdown .dropdown-item:hover {
+    background-color: hsl(210, 90%, 48%);
+    /* Light gray background on hover */
+    color: #000;
+    /* Black text on hover */
+}
+
+.custom-dropdown .dropdown-item:disabled {
+    color: #6c757d;
+    /* Gray text for disabled item */
+    cursor: not-allowed;
+    /* Change cursor for disabled item */
+}
+
+.success-message {
+    font-size: 1.2rem;
+    padding-right: 8rem;
+
+}
