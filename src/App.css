@@ -8,6 +8,15 @@ html {
   height: 100%;
 }
 
+body {
+  background: linear-gradient(195.8deg, #0b74b0ff 0%, #75479cff 51%, #bd3861ff 81%);
+}
+
+.loginBg {
+
+  height: 100%;
+}
+
 .main-content {
   padding: 20px;
 }

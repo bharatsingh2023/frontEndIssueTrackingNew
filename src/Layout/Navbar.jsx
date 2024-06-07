@@ -124,7 +124,7 @@ function CustomNavbar() {
             {selectedProject && ShwoEditProjectModal && <EditProject show={ShwoEditProjectModal} handleClose={handleCloseEditprojectModal}
                 onProjectUpdate={() => setUpdate(!update)} projectId={project_id} />}
 
-            {showIssueList && <IssueTable projectId={project_id} />}
+            {selectedProject && showIssueList && <IssueTable projectId={project_id} />}
 
 
             <Navbar bg="primary" expand="lg" className="fixed-top" variant="dark">
@@ -159,7 +159,7 @@ function CustomNavbar() {
                         ))}
                     </NavDropdown>
 
-                    <div className="selected-project me-3">
+                    <div className="selected-project me-1">
                         {selectedProject ? selectedProject : "No project selected"}
                     </div>
 

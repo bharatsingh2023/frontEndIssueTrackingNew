@@ -1,11 +1,10 @@
 // src/ApiService/FetchingIssueCategory.js
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8082';
 
-const fetchIssueList = async () => {
+const IssueListFetch = async (projectId) => {
     try {
-        const response = await axios.get(`${BASE_URL}/issueDetails/getIssueCategory`);
+        const response = await axios.get(`/issueListBase/issueList/${projectId}`);
 
         return response.data;
     } catch (error) {
@@ -14,4 +13,32 @@ const fetchIssueList = async () => {
     }
 };
 
-export default fetchIssueList;
+
+const updateIssueAPI = async (issueToUpdate) => {
+    try {
+        const response = await axios.post(`/issueListBase/issueList/updateIssueList`, issueToUpdate, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error in update Project:', error);
+        return error.response;
+    }
+};
+
+
+const deleteIssueById = async (issueId) => {
+    try {
+        console.log("--> delete issue with ID:", issueId);
+        const response = await axios.delete(`/issueListBase/issueList/delete/${issueId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting issue by ID:', error.response || error.message);
+        throw new Error('Failed to delete issue by ID');
+    }
+};
+
+
+export { IssueListFetch, updateIssueAPI, deleteIssueById };

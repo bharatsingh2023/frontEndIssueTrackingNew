@@ -11,12 +11,20 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
+
       '/chat-websocket': {
         target: 'ws://localhost:8083',
         changeOrigin: true,
         ws: true,
         rewrite: (path) => path.replace(/^\/chat-websocket/, ''),
       },
+      '/issueListBase': {
+        target: 'http://localhost:8085',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/issueListBase/, ''),
+      },
+
+
     },
   },
   css: {
