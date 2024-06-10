@@ -1,11 +1,11 @@
 // src/ApiService/FetchingIssueCategory.js
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8082';
+//const BASE_URL = 'http://localhost:8082';
 
 const FetchingIssueCategory = async () => {
     try {
-        const response = await axios.get(`${BASE_URL}/issueDetails/getIssueCategory`);
+        const response = await axios.get(`/BaseUrl/issueDetails/getIssueCategory`);
 
         return response.data;
     } catch (error) {

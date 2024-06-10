@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const IssueListFetch = async (projectId) => {
     try {
-        const response = await axios.get(`/issueListBase/issueList/${projectId}`);
+        const response = await axios.get(`/BaseUrl/issueList/${projectId}`);
 
         return response.data;
     } catch (error) {
@@ -16,7 +16,7 @@ const IssueListFetch = async (projectId) => {
 
 const updateIssueAPI = async (issueToUpdate) => {
     try {
-        const response = await axios.post(`/issueListBase/issueList/updateIssueList`, issueToUpdate, {
+        const response = await axios.post(`/BaseUrl/issueList/updateIssueList`, issueToUpdate, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -32,7 +32,7 @@ const updateIssueAPI = async (issueToUpdate) => {
 const deleteIssueById = async (issueId) => {
     try {
         console.log("--> delete issue with ID:", issueId);
-        const response = await axios.delete(`/issueListBase/issueList/delete/${issueId}`);
+        const response = await axios.delete(`/BaseUrl/issueList/delete/${issueId}`);
         return response.data;
     } catch (error) {
         console.error('Error deleting issue by ID:', error.response || error.message);

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Modal, Alert, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { signup } from '../ApiService/SignupApiService';
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'; // Importing icons from react-icons
 
 function Login() {
     const [showSignUp, setShowSignUp] = useState(false);
@@ -15,8 +17,21 @@ function Login() {
 
     const [forgotUsernameOrEmail, setForgotUsernameOrEmail] = useState('');
 
-    const handleCloseSignUp = () => setShowSignUp(false);
-    const handleShowSignUp = () => setShowSignUp(true);
+    const [message, setMessage] = useState('');
+    const [response, setResponse] = useState(null);
+    const [isLoading, setIsLoading] = useState(false); // New state for loading
+
+    const handleCloseSignUp = () => {
+        setShowSignUp(false);
+        setMessage('');
+        setResponse(null);
+        setIsLoading(false); // Reset loading state
+    };
+    const handleShowSignUp = () => {
+        setShowSignUp(true);
+        setMessage('');
+        setResponse(null);
+    };
 
     const handleCloseForgotPassword = () => setShowForgotPassword(false);
     const handleShowForgotPassword = () => setShowForgotPassword(true);
@@ -32,12 +47,28 @@ function Login() {
 
     const handleSignUpSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true); // Set loading state to true
         const signUpData = {
             name: signUpName,
-            email: signUpEmail,
+            username: signUpEmail,
             password: signUpPassword,
         };
         console.log('Sign Up Data:', signUpData);
+        const response = await signup(signUpData);
+
+        if (response.status === 200) {
+            setMessage('Please check your mail to verify and Login!!');
+            setResponse(response.status);
+            setSignUpName('');
+            setSignUpEmail('');
+            setSignUpPassword('');
+            console.log('response From server:', response);
+        } else {
+            setMessage('Email verification Failed!!');
+            setResponse(response.status);
+            console.log('response From server:', response);
+        }
+        setIsLoading(false); // Set loading state to false
     };
 
     const handleForgotPasswordSubmit = async (e) => {
@@ -108,6 +139,12 @@ function Login() {
                     <Modal.Title>Sign Up</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {message && (
+                        <Alert variant={response === 200 ? 'success' : 'danger'}>
+                            {response === 200 ? <FaCheckCircle className="me-2" /> : <FaTimesCircle className="me-2" />}
+                            {message}
+                        </Alert>
+                    )}
                     <Form onSubmit={handleSignUpSubmit}>
                         <Form.Group className="mb-3" controlId="formBasicName">
                             <Form.Label>Full Name</Form.Label>
@@ -145,8 +182,8 @@ function Login() {
                             />
                         </Form.Group>
 
-                        <Button variant="primary" type="submit">
-                            Verify Email and Submit
+                        <Button variant="primary" type="submit" disabled={isLoading}>
+                            {isLoading ? <Spinner animation="border" size="sm" /> : 'Verify Email and Submit'}
                         </Button>
                     </Form>
                 </Modal.Body>
@@ -162,6 +199,7 @@ function Login() {
                     <Modal.Title>Forgot Password</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {message && <Alert variant={response === 200 ? 'success' : 'danger'}>{message}</Alert>}
                     <Form onSubmit={handleForgotPasswordSubmit}>
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Label>Username/Email</Form.Label>

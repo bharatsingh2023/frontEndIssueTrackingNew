@@ -94,8 +94,7 @@ function AddIssue({ show, handleClose, projectId }) {
                         <Form.Control as="select" value={issue_status} onChange={(e) => setIssueStatus(e.target.value)} required>
                             <option value="Open">Open</option>
                             <option value="Fixed">Fixed</option>
-                            <option value="Closed">Closed</option>
-                            <option value="ReOpened">Re-Opened</option>
+
                         </Form.Control>
                     </Form.Group>
 
