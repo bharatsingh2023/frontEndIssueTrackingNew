@@ -13,6 +13,8 @@ import AddNewProjectModal from '../components/AddNewProjectModal';
 import { fetchProjectList, deleteProjectById } from '../ApiService/ProjectSaveApiService';
 import EditProject from '../components/EditProject';
 import { CheckCircleFill } from 'react-bootstrap-icons'; // Importing the green tick icon
+import MyProfileModal from '../components/MyProfileModal';
+import { useNavigate } from 'react-router-dom';
 
 function CustomNavbar() {
     const [selectedProject, setSelectedProject] = useState("");
@@ -31,8 +33,9 @@ function CustomNavbar() {
     const [projectOptions, setProjectOptions] = useState([]);
     const [error, setError] = useState("");
 
-
-
+    const [showProfileModal, setShowProfileModal] = useState(false);
+    const [userName, setUserName] = useState('John Doe');
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -56,6 +59,7 @@ function CustomNavbar() {
         setSelectedProject(projectName);
         setProjectId(projectId);
         setShowProjectWarning(false);
+        //  handleIssueListViewClick();
     };
 
     const handleAddIssueClick = () => {
@@ -78,6 +82,10 @@ function CustomNavbar() {
     const handleAddProjectClick = () => {
         setShwoAddProjectModal(true);
     };
+
+
+
+
     const handleEditProjectClick = () => {
         if (!selectedProject) {
             setShowProjectWarning(true);
@@ -110,6 +118,15 @@ function CustomNavbar() {
             }, 2000);
 
         }
+    };
+
+    const handleLogout = () => {
+        localStorage.clear();
+        setShowProfileModal(false);
+        navigate('/');
+
+
+
     };
 
     const handleCloseModal = () => setShowModal(false);
@@ -182,11 +199,17 @@ function CustomNavbar() {
                         </Nav>
                     </Navbar.Collapse>
 
-                    <Navbar.Brand href="#">
+                    <Navbar.Brand href="#" onClick={() => setShowProfileModal(true)}>
                         <div className="d-flex align-items-center">
                             <PersonCircle size={35} className="rounded-circle me-2" title="My Profile" />
                         </div>
                     </Navbar.Brand>
+                    <MyProfileModal
+                        show={showProfileModal} // Updated prop name
+                        onHide={() => setShowProfileModal(false)} // Updated prop name
+                        userName={userName}
+                        onLogout={handleLogout}
+                    />
                 </Container>
             </Navbar>
 

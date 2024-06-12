@@ -11,9 +11,30 @@ const signup = async (signupData) => {
         });
         return response;
     } catch (error) {
-        console.error('Error while saving issue:', error);
+        console.error('Error while signup:', error);
         return error.response;
     }
 };
 
-export { signup };
+const login = async (loginData) => {
+    const formData = new FormData();
+
+    for (const key in loginData) {
+        formData.append(key, loginData[key]);
+    }
+
+    try {
+        const response = await axios.post(`/BaseUrl/userLogin/login`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Error while login:', error);
+        return error.response;
+    }
+
+};
+
+export { signup, login };
