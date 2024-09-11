@@ -1,18 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { IssueListFetch, deleteIssueById } from '../ApiService/fetchIssueList';
 import { Modal, Button } from 'react-bootstrap';
 import { AiOutlineCheckCircle, AiOutlineDelete, AiOutlineCloseCircle, AiOutlineEdit } from 'react-icons/ai';
 import UpdateIssueModal from './UpdateIssueModal';
-import CommentsAndImage from './CommentsAndImage';
-import '../Layout/Navbar.css';
-import { issueTrackingContext } from './Context';
-import { useParams } from 'react-router-dom';
 
-function IssueTable() {
-    const { addIssueStatus, setAddIssueStatus } = useContext(issueTrackingContext);
-
+function IssueTable({ projectId, addIssueStatus, onAddIssueStatusChange }) {
     const [issues, setIssueList] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [modalContent, setModalContent] = useState({});
@@ -20,34 +14,30 @@ function IssueTable() {
     const [deleted, setDeleted] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [currentIssue, setCurrentIssue] = useState(null);
-    const [showCommentsModal, setShowCommentsModal] = useState(false);
-    const [selectedIssue, setSelectedIssue] = useState(null);
-    const [refresh, setRefresh] = useState(false);
 
-    const { project_id } = useParams();
+
 
     useEffect(() => {
+
+
         async function fetchIssueList() {
             try {
-                const issuesList = await IssueListFetch(project_id);
+                const issuesList = await IssueListFetch(projectId);
                 console.log("issuesList--> ", issuesList);
                 setIssueList(issuesList);
                 setDeleted(false);
-                setAddIssueStatus(false);
+                onAddIssueStatusChange();
                 setUpdated(false);
-                setRefresh(false);
             } catch (error) {
                 console.error('Error fetching issue list:', error);
             }
         }
 
-        fetchIssueList();
-    }, [project_id, updated, deleted, addIssueStatus, refresh]);
 
-    const handleCommentsAndImageModal = (row) => {
-        setSelectedIssue(row);
-        setShowCommentsModal(true);
-    };
+        fetchIssueList();
+    }, [projectId, updated, deleted, addIssueStatus]);
+
+
 
     const handleUpdate = (issue) => {
         setCurrentIssue(issue);
@@ -73,15 +63,6 @@ function IssueTable() {
         }
     };
 
-    const handleCommentsModalClose = () => {
-        setShowCommentsModal(false);
-        setSelectedIssue(null);
-    };
-
-    const handleRefresh = () => {
-        setRefresh(true);
-    }
-
     const customRowStyles = {
         cursor: 'pointer',
         '&:hover': {
@@ -93,23 +74,11 @@ function IssueTable() {
 
     const columns = [
         {
-            name: 'Sl No',
-            cell: (row, index) => index + 1,
-            maxWidth: '30px',
-            style: {
-                textAlign: 'center',
-            },
-        },
-        {
             name: 'Logged By',
             selector: row => row.loggedby,
             sortable: true,
             wrap: true,
             maxWidth: '150px',
-            style: {
-                whiteSpace: 'normal',
-                wordWrap: 'break-word',
-            },
         },
         {
             name: 'Logged On',
@@ -117,45 +86,13 @@ function IssueTable() {
             sortable: true,
             wrap: true,
             maxWidth: '100px',
-            style: {
-                whiteSpace: 'normal',
-                wordWrap: 'break-word',
-            },
         },
-        //issue_phase:"Design" issue_taskormodule: ""
-
         {
             name: 'Issue Category',
             selector: row => row.issuecategory,
             sortable: true,
             wrap: true,
             maxWidth: '150px',
-            style: {
-                whiteSpace: 'normal',
-                wordWrap: 'break-word',
-            },
-        },
-        {
-            name: 'Phase',
-            selector: row => row.issue_phase,
-            sortable: true,
-            wrap: true,
-            maxWidth: '50px',
-            style: {
-                whiteSpace: 'normal',
-                wordWrap: 'break-word',
-            },
-        },
-        {
-            name: 'Task/Module',
-            selector: row => row.issue_taskormodule,
-            sortable: true,
-            wrap: true,
-            maxWidth: '50px',
-            style: {
-                whiteSpace: 'normal',
-                wordWrap: 'break-word',
-            },
         },
         {
             name: 'Description',
@@ -187,7 +124,7 @@ function IssueTable() {
                 marginTop: '0',
                 maxWidth: '300px',
             },
-            cell: row => <div className='commentCell' style={{ maxWidth: '300px' }} onClick={() => handleCommentsAndImageModal(row)}><a href="#">({row.commentsEntity.length}) See Comments</a></div>,
+            cell: row => <div style={{ maxWidth: '300px' }}>{row.comments}</div>,
         },
         {
             name: 'Fixed By',
@@ -195,10 +132,6 @@ function IssueTable() {
             sortable: true,
             wrap: true,
             maxWidth: '100px',
-            style: {
-                whiteSpace: 'normal',
-                wordWrap: 'break-word',
-            },
         },
         {
             name: 'Issue Status',
@@ -206,10 +139,6 @@ function IssueTable() {
             sortable: true,
             wrap: true,
             maxWidth: '100px',
-            style: {
-                whiteSpace: 'normal',
-                wordWrap: 'break-word',
-            },
         },
         {
             name: 'Action',
@@ -281,8 +210,6 @@ function IssueTable() {
                             color: '#800080',
                         },
                     },
-
-
                 }}
             />
             {currentIssue && (
@@ -308,15 +235,6 @@ function IssueTable() {
                     </Button>
                 </Modal.Footer>
             </Modal>
-
-            {showCommentsModal && (
-                <CommentsAndImage
-                    show={showCommentsModal}
-                    handleClose={handleCommentsModalClose}
-                    issueData={selectedIssue}
-                    onCommentDone={handleRefresh}
-                />
-            )}
         </>
     );
 }

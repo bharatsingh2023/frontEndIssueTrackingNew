@@ -4,23 +4,21 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Card from 'react-bootstrap/Card';
 import Spinner from 'react-bootstrap/Spinner';
-import { saveIssue } from '../ApiService/IssueSavingApiService';
+import { updateIssueAPI } from '../ApiService/fetchIssueList';
 import FetchingIssueCategory from '../ApiService/FetchingIssueCategory';
 
-function AddIssue({ show, handleClose, projectId, onIssueSave }) {
-    const fullName = localStorage.getItem('fullName');
+function UpdateIssueModal({ show, handleClose, issueData, onProjectUpdate }) {
     const [issue_category, setIssueCategory] = useState('');
-    const [issue_status, setIssueStatus] = useState('Open');
-    const [logged_by, setLogged_by] = useState(fullName);
+    const [issue_status, setIssueStatus] = useState('');
     const [description, setDescription] = useState('');
-    const [comments, setComments] = useState('');
-    const [file, setFile] = useState(null);
+    // const [comments, setComments] = useState('');
     const [fixed_by, setFixedBy] = useState('');
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [issue_phase, setIssuePhase] = useState('');
     const [issue_taskormodule, setIssueTaskormodule] = useState('');
+
     useEffect(() => {
         async function fetchIssueCategories() {
             try {
@@ -34,72 +32,72 @@ function AddIssue({ show, handleClose, projectId, onIssueSave }) {
         fetchIssueCategories();
     }, []);
 
+    useEffect(() => {
+        if (issueData) {
+            setIssueCategory(issueData.issuecategory);
+            setIssueStatus(issueData.issuestatus);
+            setDescription(issueData.description);
+            // setComments(issueData.comments);
+            setFixedBy(issueData.fixedby);
+            setIssuePhase(issueData.issue_phase);
+            setIssueTaskormodule(issueData.issue_taskormodule);
+        }
+    }, [issueData]);
+
     const resetFields = () => {
         setIssueCategory('');
-        setIssueStatus('Open');
-        setLogged_by(fullName);
+        setIssueStatus('');
         setDescription('');
-        setComments('');
+        // setComments('');
         setFixedBy('');
-        setIssueTaskormodule('');
         setIssuePhase('');
-        setFile(null);
+        setIssueTaskormodule('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
-
-        const issueData = {
-            issue_category,
-            logged_by,
-            issue_status,
+        const updatedIssueData = {
+            ...issueData,
+            issuecategory: issue_category,
+            issuestatus: issue_status,
             description,
-            comments,
-            projectId,
-            fixed_by: issue_status === 'Fixed' ? fixed_by : '',
+            // comments,
+            fixedby: issue_status === 'Fixed' ? fixed_by : '',
             issue_phase,
             issue_taskormodule,
+
         };
 
-        const formData = new FormData();
-        formData.append('issueData', JSON.stringify(issueData));
-        if (file) {
-            formData.append('image', file);
-        }
-
         try {
-            const response = await saveIssue(formData);
+            const response = await updateIssueAPI(updatedIssueData);
             console.log('Response:', response);
             setSaved(true);
-
             setTimeout(() => {
-                handleClose();
+                handleClose(true);
                 resetFields();
-                onIssueSave(true);
                 setSaved(false);
+                onProjectUpdate();
             }, 1000);
         } catch (error) {
-            console.error('Error saving issue:', error);
+            console.error('Error updating issue:', error);
         } finally {
             setSaving(false);
         }
     };
 
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
-    };
-
     const handleCardClose = () => {
         setSaved(false);
-        handleClose();
+        handleClose(false);
         resetFields();
     };
 
+    if (!issueData) return null;
+
     return (
-        <Modal show={show} onHide={handleClose}>
+        <Modal show={show} onHide={() => handleClose(false)}>
             <Modal.Header closeButton>
-                <Modal.Title>Add Issue</Modal.Title>
+                <Modal.Title>Update Issue</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
@@ -130,6 +128,7 @@ function AddIssue({ show, handleClose, projectId, onIssueSave }) {
                         </Form.Control>
                     </Form.Group>
 
+
                     <Form.Group className="mb-3" controlId="issueStatus">
                         <Form.Label>Issue Status</Form.Label>
                         <Form.Control as="select" value={issue_status} onChange={(e) => setIssueStatus(e.target.value)} required>
@@ -150,15 +149,10 @@ function AddIssue({ show, handleClose, projectId, onIssueSave }) {
                         <Form.Control as="textarea" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} required />
                     </Form.Group>
 
-                    <Form.Group className="mb-3" controlId="comments">
+                    {/* <Form.Group className="mb-3" controlId="comments">
                         <Form.Label>Comments</Form.Label>
                         <Form.Control as="textarea" rows={3} value={comments} onChange={(e) => setComments(e.target.value)} />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3" controlId="file">
-                        <Form.Label>Image</Form.Label>
-                        <Form.Control type="file" onChange={handleFileChange} />
-                    </Form.Group>
+                    </Form.Group> */}
 
                     <Button variant="primary" type="submit" disabled={saving}>
                         {saving ? <Spinner animation="border" size="sm" /> : 'Submit'}
@@ -167,14 +161,14 @@ function AddIssue({ show, handleClose, projectId, onIssueSave }) {
                 {saved && (
                     <Card className="text-center" style={{ backgroundColor: '#0a2bcb', color: 'white', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: '999', padding: '20px' }}>
                         <Card.Body>
-                            <Card.Title>Issue Saved Successfully!</Card.Title>
+                            <Card.Title>Issue Updated Successfully!</Card.Title>
                             <Button variant="light" onClick={handleCardClose}>Close</Button>
                         </Card.Body>
                     </Card>
                 )}
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
+                <Button variant="secondary" onClick={() => handleClose(false)}>
                     Close
                 </Button>
             </Modal.Footer>
@@ -182,4 +176,4 @@ function AddIssue({ show, handleClose, projectId, onIssueSave }) {
     );
 }
 
-export default AddIssue;
+export default UpdateIssueModal;

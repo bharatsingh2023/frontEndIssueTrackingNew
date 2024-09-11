@@ -1,11 +1,9 @@
-// src/components/PrivateRoute.jsx
-import React, { useEffect, useContext } from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
-import { issueTrackingContext } from './Context';
+// src/components/JwtValidator.jsx
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const PrivateRoute = () => {
-    const { isAuthenticated, setIsAuthenticated } = useContext(issueTrackingContext);
+const JwtValidator = ({ setAuthStatus: setIsAuthenticated }) => {
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -23,19 +21,23 @@ const PrivateRoute = () => {
                     } else {
                         setIsAuthenticated(false);
                     }
+                    setLoading(false);
                 })
                 .catch(error => {
                     if (error.response && error.response.status === 401) {
                         setIsAuthenticated(false);
                         localStorage.clear();
                     }
+                    setLoading(false);
                 });
         } else {
+            console.log("token::", token);
             setIsAuthenticated(false);
+            setLoading(false);
         }
     }, [setIsAuthenticated]);
 
-    if (isAuthenticated === null) {
+    if (loading) {
         return (
             <div style={{
                 display: 'flex',
@@ -44,12 +46,12 @@ const PrivateRoute = () => {
                 height: '100vh',
                 fontSize: '24px',
             }}>
-                Loading...
+                Validating session...
             </div>
         );
     }
 
-    return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+    return null;
 };
 
-export { PrivateRoute };
+export default JwtValidator;

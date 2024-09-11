@@ -1,14 +1,17 @@
-// src/App.jsx
-import React from 'react';
+import './polyfills';
+import React, { useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import AppRoute from './Utility/AppRoute';
-const App = () => {
+import { IssueTrackingContextProvider, issueTrackingContext } from './components/Context';
+import CustomNavbar from './Layout/Navbar';
 
+const App = () => {
   return (
     <>
-      <AppRoute />
-
+      <IssueTrackingContextProvider>
+        <AppRoute />
+      </IssueTrackingContextProvider>
     </>
   );
 }

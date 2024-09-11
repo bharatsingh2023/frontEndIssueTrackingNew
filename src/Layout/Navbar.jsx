@@ -1,5 +1,5 @@
 // src/Layout/Navbar.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import Nav from 'react-bootstrap/Nav';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Navbar from 'react-bootstrap/Navbar';
@@ -8,34 +8,74 @@ import { PersonCircle } from 'react-bootstrap-icons';
 import { Modal, Button } from 'react-bootstrap';
 import AddIssue from '../components/AddIssue';
 import './Navbar.css';
-import IssueTable from '../components/IssueList';
+import LogoChat from '../assets/images/support.png';
+import LogoNav from '../assets/images/beassymbol.png';
+
 import AddNewProjectModal from '../components/AddNewProjectModal';
 import { fetchProjectList, deleteProjectById } from '../ApiService/ProjectSaveApiService';
 import EditProject from '../components/EditProject';
-import { CheckCircleFill } from 'react-bootstrap-icons'; // Importing the green tick icon
-import MyProfileModal from '../components/MyProfileModal';
+import { CheckCircleFill } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
-
+import ChatBox from '../components/ChatBox';
+import { Logout } from '../ApiService/SignupApiService';
+import ChatNotification from '../components/ChatNotification';
+import AddTask from '../components/AddTask';
+import { issueTrackingContext } from '../components/Context';
 function CustomNavbar() {
-    const [selectedProject, setSelectedProject] = useState("");
+    //  const [selectedProject, setSelectedProject] = useState("");
+    const { selectedProject, setSelectedProject,
+        project_id, setProjectId,
+        taskSavedStatus, setTaskSavedStatus, setLoginResponse,
+        setIsAuthenticated, showProjectList, setShowProjectList,
+        newProjectSaved, setNewProjectSaved,
+        addIssueStatus, setAddIssueStatus } = useContext(issueTrackingContext);
+
+
+
     const [showModal, setShowModal] = useState(false);
     const [showProjectWarning, setShowProjectWarning] = useState(false);
-    const [project_id, setProjectId] = useState("");
+
     const [showIssueList, setShowIssueList] = useState(false);
     const [ShwoAddProjectModal, setShwoAddProjectModal] = useState(false);
     const [ShwoEditProjectModal, setShowEditProjectModal] = useState(false);
     const [showDeleteWarning, setShowDeleteWarning] = useState(false);
     const [success, setSuccess] = useState(false);
-    const [saved, setSaved] = useState(false);
+
     const [update, setUpdate] = useState(false);
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [showChatBox, setShowChatBox] = useState(false);
+    const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+
+    const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+    const [showTaskList, setShowTaskList] = useState(false);
 
 
     const [projectOptions, setProjectOptions] = useState([]);
     const [error, setError] = useState("");
-
-    const [showProfileModal, setShowProfileModal] = useState(false);
-    const [userName, setUserName] = useState('John Doe');
     const navigate = useNavigate();
+
+    const username = localStorage.getItem('username');
+    const fullName = localStorage.getItem('fullName');
+
+
+    const profileMenuRef = useRef(null);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+                setShowProfileMenu(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const toggleProfileMenu = () => {
+        setShowProfileMenu(!showProfileMenu);
+    };
 
 
     useEffect(() => {
@@ -49,7 +89,7 @@ function CustomNavbar() {
         }
 
         fetchProjectListData();
-    }, [success, saved, update]);
+    }, [success, newProjectSaved, update]);
 
 
 
@@ -59,7 +99,9 @@ function CustomNavbar() {
         setSelectedProject(projectName);
         setProjectId(projectId);
         setShowProjectWarning(false);
-        //  handleIssueListViewClick();
+        showIssueList == true ? setShowIssueList(true) : setShowIssueList(false);
+        showTaskList == true ? setShowTaskList(true) : setShowTaskList(false);
+        setShowProjectList(false);
     };
 
     const handleAddIssueClick = () => {
@@ -75,30 +117,34 @@ function CustomNavbar() {
         if (!selectedProject) {
             setShowProjectWarning(true);
         } else {
-            setShowIssueList(true);
+            setShowTaskList(false);
+            // setShowIssueList(true);
+            navigate(`/issueList/${project_id}`)
+
         }
     };
 
     const handleAddProjectClick = () => {
         setShwoAddProjectModal(true);
+        setShowProjectList(false);
     };
 
-
-
-
-    const handleEditProjectClick = () => {
+    const handleAddTaskClick = () => {
         if (!selectedProject) {
             setShowProjectWarning(true);
         } else {
-            setShowEditProjectModal(true);
+            setShowAddTaskModal(true);
         }
     };
 
-    const handleDeleteProjectClick = () => {
+    const handleTaskListViewClick = () => {
         if (!selectedProject) {
             setShowProjectWarning(true);
         } else {
-            setShowDeleteWarning(true);
+            // setShowTaskList(true);
+            setShowIssueList(false);
+            navigate(`/taskList/${project_id}`);
+
         }
     };
 
@@ -120,44 +166,104 @@ function CustomNavbar() {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.clear();
-        setShowProfileModal(false);
-        navigate('/');
-
-
-
+    const handleProjectListClick = () => {
+        // setShowProjectList(true);
+        setShowIssueList(false);
+        setSelectedProject("");
+        navigate('/projectList');
+        console.log('Project List clicked');
     };
 
-    const handleCloseModal = () => setShowModal(false);
-    const handleCloseAddprojectModal = () => setShwoAddProjectModal(false);
-    const handleCloseEditprojectModal = () => setShowEditProjectModal(false);
+    const handleLogout = async () => {
+        if (window.confirm('Are you sure you want to log out?')) {
+            try {
+                const logoutResp = await Logout();
+                if (logoutResp.status === 200) {
+                    setIsAuthenticated(false);
+                    localStorage.clear();
+                    setShowProfileMenu(false);
+                    navigate('/');
+                } else {
+                    console.log('Failed to logout:', logoutResp.status);
+                }
+            } catch (error) {
+                console.error('Failed to clear local storage:', error);
+            }
+        }
+    };
 
+    const handleIssueStatus = () => {
+        setAddIssueStatus(true);
+    }
+
+    const handleChatBox = () => {
+        console.log("woking onclick");
+        setShowChatBox(true);
+
+    }
+
+    const handleNewResourceAddClick = () => {
+        if (!selectedProject) {
+            setShowProjectWarning(true);
+        } else {
+            // setShowTaskList(true);
+            setShowIssueList(false);
+        }
+    }
+    const handleAddResourceInProjectClick = () => {
+        if (!selectedProject) {
+            setShowProjectWarning(true);
+        } else {
+            //  setShowTaskList(true);
+            setShowIssueList(false);
+        }
+    }
+
+
+
+    // const handleCloseChatBox = () => {
+    //     setShowChatBox(false);
+    // };
+
+    const handleCloseModal = () => setShowModal(false);
+    const handleCloseAddprojectModal = () => { setShwoAddProjectModal(false); setShowProjectList(true) }
+    const handleCloseEditprojectModal = () => setShowEditProjectModal(false);
+    const handleCloseTaskModal = () => { setShowAddTaskModal(false); }
 
     return (
         <>
-            {selectedProject && <AddIssue show={showModal} handleClose={handleCloseModal} projectId={project_id} />}
-            <AddNewProjectModal show={ShwoAddProjectModal} handleClose={handleCloseAddprojectModal} onProjectSaved={() => setSaved(!saved)} />
+            {selectedProject && <AddIssue show={showModal} handleClose={handleCloseModal} projectId={project_id} onIssueSave={handleIssueStatus} />}
+            <AddNewProjectModal show={ShwoAddProjectModal} handleClose={handleCloseAddprojectModal} onProjectSaved={() => setNewProjectSaved(!newProjectSaved)} />
             {selectedProject && ShwoEditProjectModal && <EditProject show={ShwoEditProjectModal} handleClose={handleCloseEditprojectModal}
                 onProjectUpdate={() => setUpdate(!update)} projectId={project_id} />}
 
-            {selectedProject && showIssueList && <IssueTable projectId={project_id} />}
+            {selectedProject && <AddTask show={showAddTaskModal} handleClose={handleCloseTaskModal} projectId={project_id} />}
+
+
 
 
             <Navbar bg="primary" expand="lg" className="fixed-top" variant="dark">
                 <Container fluid>
                     <Navbar.Brand href="#" className="ms-5">
                         <img
-                            src="src/assets/images/tigr.jpg"
-                            width="50"
-                            height="50"
+                            src={LogoNav}
+
+                            width="70"
+                            height="70"
                             className="d-inline-block align-top rounded-circle"
                             style={{ borderRadius: "50%" }}
                         />
                     </Navbar.Brand>
-                    <Nav.Link title="Add New Project" className="me-3" onClick={handleAddProjectClick}>
-                        Add New Project
-                    </Nav.Link>
+                    <Nav className="me-auto">
+                        <NavDropdown title="Project" id="basic-nav-dropdown" className="ms-3 custom-dropdown">
+                            <NavDropdown.Item onClick={handleAddProjectClick}>
+                                Add New Project
+                            </NavDropdown.Item>
+                            <NavDropdown.Item onClick={handleProjectListClick}>
+                                Project List
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                    </Nav>
 
                     <NavDropdown
                         title={selectedProject === "" ? "Select Project" : selectedProject}
@@ -181,35 +287,56 @@ function CustomNavbar() {
                     </div>
 
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="ms-auto">
-                            <Nav.Link title="Add Issue" onClick={handleAddIssueClick}>
+
+                    <Nav className="me-auto">
+                        <NavDropdown title="Task" id="basic-nav-dropdown" className="ms-3 custom-dropdown">
+                            <NavDropdown.Item onClick={handleAddTaskClick}>
+                                Add Task
+                            </NavDropdown.Item>
+                            <NavDropdown.Item onClick={handleTaskListViewClick}>
+                                View Tasks
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                    </Nav>
+                    <Nav className="me-auto">
+                        <NavDropdown title="Issue" id="basic-nav-dropdown" className="ms-3 custom-dropdown">
+                            <NavDropdown.Item onClick={handleAddIssueClick}>
                                 Add Issue
-                            </Nav.Link>
-                            <Nav.Link title="View Issue List" onClick={handleIssueListViewClick}>
-                                View Issue List
-                            </Nav.Link>
+                            </NavDropdown.Item>
+                            <NavDropdown.Item onClick={handleIssueListViewClick}>
+                                View Issues
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                    </Nav>
 
-                            <Nav.Link title="Edit Project" onClick={handleEditProjectClick}>
-                                Edit Project
-                            </Nav.Link>
-                            <Nav.Link title="Delete Project" onClick={handleDeleteProjectClick} >
-                                Delete Project
-                            </Nav.Link>
-                        </Nav>
-                    </Navbar.Collapse>
+                    <Nav className="me-auto">
+                        <NavDropdown title="Resource" id="basic-nav-dropdown" className="ms-3 custom-dropdown">
+                            <NavDropdown.Item onClick={handleNewResourceAddClick}>
+                                New Resource
+                            </NavDropdown.Item>
+                            <NavDropdown.Item onClick={handleAddResourceInProjectClick}>
+                                Add Resource in Project
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                    </Nav>
 
-                    <Navbar.Brand href="#" onClick={() => setShowProfileModal(true)}>
+                    <Navbar.Brand href="#" onClick={toggleProfileMenu}>
                         <div className="d-flex align-items-center">
                             <PersonCircle size={35} className="rounded-circle me-2" title="My Profile" />
                         </div>
                     </Navbar.Brand>
-                    <MyProfileModal
-                        show={showProfileModal} // Updated prop name
-                        onHide={() => setShowProfileModal(false)} // Updated prop name
-                        userName={userName}
-                        onLogout={handleLogout}
-                    />
+                    {showProfileMenu && (
+                        <div className="profileMenu" ref={profileMenuRef}>
+                            <ul>
+                                <li>
+                                    <b>Hi,</b>
+                                    <br />
+                                    {fullName ? fullName : username}!
+                                </li>
+                                <li onClick={handleLogout}><a>Logout</a></li>
+                            </ul>
+                        </div>
+                    )}
                 </Container>
             </Navbar>
 
@@ -253,8 +380,38 @@ function CustomNavbar() {
                 </Modal.Footer>
             </Modal>
 
+            <div>
+                {!showChatBox && (
+                    <ChatNotification onUnreadMessageCountChange={setUnreadMessageCount} />
+                )}
+                <div>
+                    {!showChatBox && (
+                        <Button className="open-button" onClick={handleChatBox}>
+                            {unreadMessageCount > 0 && (
+                                <div className="unread-count-closed-box">
+                                    <div className="speech-bubble">
+                                        {unreadMessageCount}
+                                    </div>
+                                </div>
+                            )}
+                            <img
+                                // src="src/assets/images/support.png"
+                                src={LogoChat}
+                                style={{ maxWidth: '70px', maxHeight: '70px' }}
+                                alt="Support"
+                            />
+                        </Button>
+                    )}
+                    <ChatBox show={showChatBox} handleClose={() => setShowChatBox(false)} />
+                </div>
+            </div>
 
-
+            {/* <div className="main-content">
+                {selectedProject && showIssueList && <IssueTable projectId={project_id} addIssueStatus={addIssueStatus} onAddIssueStatusChange={() => setAddIssueStatus(!true)} />}
+            </div> */}
+            {/* <div className="main-content">
+                {showProjectList && < ProjectList />}
+            </div> */}
         </>
     );
 }

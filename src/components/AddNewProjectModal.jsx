@@ -16,7 +16,7 @@ function AddNewProjectModal({ show, handleClose, onProjectSaved }) {
         client_name: '',
         project_manager_name: '',
         customer_contact_person_name: '',
-        type_of_project: '' // Dropdown field
+        type_of_project: ''
     };
 
     const [projectData, setProjectData] = useState(initialProjectData);

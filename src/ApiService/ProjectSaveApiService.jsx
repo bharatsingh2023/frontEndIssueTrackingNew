@@ -1,10 +1,8 @@
-import axios from 'axios';
-
-//const Base_url = "http://localhost:8081";
+import axiosInstance from '../Utility/axiosInstance';
 
 const saveProject = async (ProjectData) => {
     try {
-        const response = await axios.post(`/BaseUrl/addNewProject/addProject`, ProjectData, {
+        const response = await axiosInstance.post(`/BaseUrl/addNewProject/addProject`, ProjectData, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -20,7 +18,7 @@ const saveProject = async (ProjectData) => {
 
 const fetchProjectList = async () => {
     try {
-        const response = await axios.get(`/BaseUrl/addNewProject/allProjects`);
+        const response = await axiosInstance.get(`/BaseUrl/addNewProject/allProjects`);
 
         return response.data;
     } catch (error) {
@@ -32,7 +30,8 @@ const fetchProjectList = async () => {
 const fetchProjectById = async (project_id) => {
     try {
         console.log("--> Fetching project with ID:", project_id);
-        const response = await axios.get(`/BaseUrl/addNewProject/${project_id}`);
+        const response = await axiosInstance.get(`/BaseUrl/addNewProject/${project_id}`);
+
         return response.data;
     } catch (error) {
         console.error('Error fetching project by ID:', error.response || error.message);
@@ -44,7 +43,7 @@ const fetchProjectById = async (project_id) => {
 
 const UpdateProject = async (ProjectData) => {
     try {
-        const response = await axios.post(`/BaseUrl/addNewProject/updateproject`, ProjectData, {
+        const response = await axiosInstance.post(`/BaseUrl/addNewProject/updateproject`, ProjectData, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -60,7 +59,7 @@ const UpdateProject = async (ProjectData) => {
 const deleteProjectById = async (project_id) => {
     try {
         console.log("--> delete project with ID:", project_id);
-        const response = await axios.delete(`/BaseUrl/addNewProject/projectDelete/${project_id}`);
+        const response = await axiosInstance.delete(`/BaseUrl/addNewProject/projectDelete/${project_id}`);
         return response.data;
     } catch (error) {
         console.error('Error deleting project by ID:', error.response || error.message);

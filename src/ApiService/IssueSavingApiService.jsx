@@ -1,12 +1,11 @@
-import axios from 'axios';
-
-//const Base_url = "http://localhost:8082";
+import axiosInstance from '../Utility/axiosInstance';
 
 const saveIssue = async (issueData) => {
     try {
-        const response = await axios.post(`/BaseUrl/issueDetails/submitIssue`, issueData, {
+
+        const response = await axiosInstance.post(`/BaseUrl/issueDetails/submitIssue`, issueData, {
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'multipart/form-data',
             },
         });
         return response.data;
@@ -17,3 +16,4 @@ const saveIssue = async (issueData) => {
 };
 
 export { saveIssue };
+

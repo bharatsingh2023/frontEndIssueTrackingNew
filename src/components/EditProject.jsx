@@ -80,6 +80,24 @@ function EditProject({ show, handleClose, projectId, onProjectUpdate }) {
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
+
+                    <Form.Group controlId="typeOfProject">
+                        <Form.Label>Type of Project</Form.Label>
+                        <Form.Control
+                            as="select"
+                            name="type_of_project"
+                            value={projectData.type_of_project}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Select Type</option>
+                            <option value="Development/Enhancement">Development/Enhancement</option>
+                            <option value="Enhancement & Maintenance">Enhancement & Maintenance</option>
+                            <option value="Maintenance & Support">Maintenance & Support</option>
+                        </Form.Control>
+                    </Form.Group>
+
+
                     <Form.Group controlId="projectId">
                         <Form.Label>Project ID</Form.Label>
                         <Form.Control
@@ -166,21 +184,7 @@ function EditProject({ show, handleClose, projectId, onProjectUpdate }) {
                         />
                     </Form.Group>
 
-                    <Form.Group controlId="typeOfProject">
-                        <Form.Label>Type of Project</Form.Label>
-                        <Form.Control
-                            as="select"
-                            name="type_of_project"
-                            value={projectData.type_of_project}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Select Type</option>
-                            <option value="Development/Enhancement">Development/Enhancement</option>
-                            <option value="Enhancement & Maintenance">Enhancement & Maintenance</option>
-                            <option value="Maintenance & Support">Maintenance & Support</option>
-                        </Form.Control>
-                    </Form.Group>
+
 
                     <Button variant="primary" type="submit" style={{ marginTop: '1rem' }} disabled={saving}>
                         {saving ? <Spinner animation="border" size="sm" /> : 'Update Project'}

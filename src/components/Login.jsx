@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Container, Row, Col, Form, Button, Modal, Alert, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { signup, login } from '../ApiService/SignupApiService';
+import { signup, login, verifyUser } from '../ApiService/SignupApiService';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
-
+import { issueTrackingContext } from './Context';
 function Login() {
+
+    const { setIsAuthenticated } = useContext(issueTrackingContext);
+
     const [showSignUp, setShowSignUp] = useState(false);
     const [showForgotPassword, setShowForgotPassword] = useState(false);
 
@@ -24,18 +27,26 @@ function Login() {
 
     const location = useLocation();
     const navigate = useNavigate();
+
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
-        const verified = queryParams.get('verified');
+        const username = queryParams.get('username');
 
-        if (verified === 'true') {
-            setMessage('You are successfully verified!');
-            setResponse(200);
-        } else if (verified === 'false') {
-            setMessage('Verification Failed!');
-            setResponse(400);
+        if (username) {
+            console.log("username-->", username);
+            verifyUser(username).then(response => {
+                if (response.data) {
+                    setMessage('You are successfully verified!');
+                    setResponse(200);
+                } else {
+                    setMessage('Verification Failed!');
+                    setResponse(400);
+                }
+            });
         }
     }, [location]);
+
+
 
 
     useEffect(() => {
@@ -44,16 +55,22 @@ function Login() {
             timer = setTimeout(() => {
                 setMessage('');
                 setResponse(null);
-            }, 2000);
+            }, 10000);
         }
         return () => clearTimeout(timer);
     }, [message]);
 
     const handleCloseSignUp = () => {
-        setShowSignUp(false);
-        setMessage('');
+
+
         setResponse(null);
         setIsLoading(false);
+        setShowSignUp(false);
+        setMessage('');
+        setTimeout(() => {
+
+        }, 10000);
+
     };
 
     const handleShowSignUp = () => {
@@ -76,12 +93,33 @@ function Login() {
         console.log('Login Data sent:', loginData);
 
         if (response.status === 200) {
-            const token = response.data;
-            console.log('jwt token :', token);
+            const responseData = response.data;
+            const [token, username, fullName, Id] = responseData.split(',');
+            console.log('Full Name:', fullName);
+            console.log('Username:', username);
             localStorage.setItem('token', token);
-            console.log('Login Data response:', response);
-            navigate('/home');
+            localStorage.setItem('username', username);
+            localStorage.setItem('fullName', fullName);
+            localStorage.setItem('userId', Id);
+            setIsAuthenticated(true);
+            setResponse(response.status);
+            navigate('/projectList');
+            // navigate('/home');
         }
+        else {
+            if (response.status == 401) {
+                setResponse(response.status);
+                setMessage('Unauthorized, Bad Credential!!');
+            }
+
+            else {
+                setResponse(response.status);
+                setMessage('Failed to Login!! Please Check your Id/Password');
+                console.log('error code,', response.status);
+
+            }
+        }
+
     };
 
     const handleSignUpSubmit = async (e) => {
@@ -96,13 +134,19 @@ function Login() {
         const response = await signup(signUpData);
 
         if (response.status === 200) {
-            setMessage('Please check your mail to verify and Login!!');
+            setMessage('Click the link sent to your mail to verify and Login!!');
             setResponse(response.status);
             setSignUpName('');
             setSignUpEmail('');
             setSignUpPassword('');
+
             console.log('response From server:', response);
-        } else {
+        }
+        else if (response.status == 400) {
+            setResponse(response.status);
+            setMessage(response.data);
+        }
+        else {
             setMessage('Email verification Failed!!');
             setResponse(response.status);
             console.log('response From server:', response);
@@ -235,7 +279,7 @@ function Login() {
                             </Form.Group>
 
                             <Button variant="primary" type="submit" disabled={isLoading}>
-                                {isLoading ? <Spinner animation="border" size="sm" /> : 'Verify Email and Submit'}
+                                {isLoading ? <Spinner animation="border" size="sm" /> : 'Signup'}
                             </Button>
                         </Form>
 

@@ -1,12 +1,21 @@
 /* src/App.css */
 
+
 body,
 html {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
+  /* height: 100%; */
 }
+
+.main-content {
+  /* padding: 2rem; */
+  margin-top: 3.5rem;
+  padding-top: 20px;
+
+}
+
 
 body {
   background: linear-gradient(195.8deg, #0b74b0ff 0%, #75479cff 51%, #bd3861ff 81%);
@@ -17,9 +26,7 @@ body {
   height: 100%;
 }
 
-.main-content {
-  padding: 20px;
-}
+
 
 #root {
   width: 100%;
@@ -71,4 +78,82 @@ body {
 
 .read-the-docs {
   color: #888;
+}
+
+
+.custom-title {
+  text-align: center;
+  font-weight: bold;
+  background: linear-gradient(195.8deg, rgba(11, 116, 176, 0.2) 0%, rgba(117, 73, 156, 0.2) 51%, rgba(189, 56, 97, 0.2) 81%);
+  color: #800080;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.custom-cell {
+  max-width: 100%;
+  overflow: hidden;
+  /* text-overflow: ellipsis; */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding: 10px;
+  margin-top: 0;
+}
+
+.kzZBXj {
+  overflow: unset !important;
+  white-space: normal !important;
+  text-overflow: initial !important;
+}
+
+.eFEHrh div:first-child {
+  overflow: unset !important;
+  white-space: normal !important;
+  text-overflow: initial !important;
+}
+
+/* Task Table */
+.table-wrapper {
+  margin-top: 6rem;
+  overflow-x: auto;
+  /* Enables horizontal scrolling if necessary */
+  overflow-y: auto;
+  /* Enables vertical scrolling if necessary */
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 3px;
+  text-align: center;
+  /* Center text in cells */
+}
+
+.table th {
+  background-color: #f2f2f2;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  /* Ensure header is above the table body */
+}
+
+.table-wrapper tbody {
+  display: block;
+  height: 450px;
+  /* Set a fixed height for the body section */
+  overflow-y: auto;
+  /* Enable vertical scrolling */
+}
+
+.table-wrapper thead,
+.table-wrapper tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  /* Ensures the table header and body align properly */
 }

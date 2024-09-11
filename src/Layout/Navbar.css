@@ -52,7 +52,8 @@
 
 /* Navbar.css */
 .custom-dropdown .dropdown-menu {
-    padding-left: 10px;
+    padding-left: 2px;
+    padding-right: 2px;
     /* Add padding from the left */
 }
 
@@ -79,4 +80,118 @@
     font-size: 1.2rem;
     padding-right: 8rem;
 
+}
+
+
+
+.profileMenu {
+    position: absolute;
+    width: 20%;
+    background: rgba(255, 255, 255, 0.9);
+    /* Background color with transparency */
+    top: 65px;
+    z-index: 999;
+    right: 16px;
+    box-shadow: 0 2px 4px rgba(66, 44, 44, 0.5);
+    border-radius: 10px;
+    /* Rounded corners */
+    padding: 10px;
+}
+
+.profileMenu ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.profileMenu li {
+    margin: 0;
+    padding: 8px 12px;
+    /* Adjust padding for better spacing */
+    border-bottom: 1px dotted #c3bfbf;
+    cursor: pointer;
+    /* Add cursor pointer for better UX */
+}
+
+.profileMenu li:hover {
+    background-color: #d8ceeb;
+    /* Add hover effect */
+    border-radius: 5px;
+    /* Round corners on hover */
+}
+
+/* ChatBoX  */
+
+.open-button {
+    background-color: transparent;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    opacity: 1;
+    position: fixed;
+    bottom: 0px;
+    right: -17px;
+    z-index: 1031;
+
+
+
+}
+
+/* .commentCell:hover {
+    background-color: #007bff;
+    color: white;
+} */
+
+
+
+.comments-right {
+    /* display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right; */
+    color: #4a6b51;
+}
+
+.EditDeleteIcons {
+    text-align: right;
+    margin-top: -17px;
+}
+
+.unread-count-closed-box {
+    position: absolute;
+    top: -10px;
+    right: 40px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    /* Smaller font size */
+    padding: 2px 6px;
+    /* Smaller padding */
+    border-radius: 50%;
+    z-index: 10;
+}
+
+
+.speech-bubble {
+    position: relative;
+    /* background: #ff5e5e; */
+    border-radius: .3em;
+    padding: 3px 7px;
+    color: white;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.speech-bubble:after {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: 7px 7px 0;
+    border-color: #ff0101 transparent;
+    display: block;
+    width: 0;
+    z-index: 1;
+    bottom: -7px;
+    left: 50%;
+    transform: translateX(-50%);
 }
